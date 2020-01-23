@@ -1,0 +1,210 @@
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/base.order/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+    - &Org1
+        Name: LeftOrgMSP
+        ID: LeftOrgMSP
+        MSPDir: crypto-config/peerOrganizations/base.left/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('LeftOrgMSP.admin', 'LeftOrgMSP.peer', 'LeftOrgMSP.client','LeftOrgMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('LeftOrgMSP.admin', 'LeftOrgMSP.client','LeftOrgMSP.peer','LeftOrgMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('LeftOrgMSP.admin','LeftOrgMSP.peer')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('LeftOrgMSP.peer')"    
+        AnchorPeers:
+            - Host: peer1.base.left
+              Port: 7051
+
+    - &Org2
+        Name: RightOrgMSP
+        ID: RightOrgMSP
+        MSPDir: crypto-config/peerOrganizations/base.right/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('RightOrgMSP.admin', 'RightOrgMSP.peer', 'RightOrgMSP.client','RightOrgMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('RightOrgMSP.admin','RightOrgMSP.peer', 'RightOrgMSP.client','RightOrgMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('LeftOrgMSP.admin','RightOrgMSP.peer')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('RightOrgMSP.peer')"     
+
+        AnchorPeers:
+            - Host: peer1.base.right
+              Port: 9051            
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_4_3: true
+        V1_3: false
+        V1_1: false
+    Orderer: &OrdererCapabilities
+        V1_4_2: true
+        V1_1: false
+    Application: &ApplicationCapabilities
+        V1_4_2: true
+        V1_3: false
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"    
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    MainChannel:
+        Consortium: BaseConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    Raft:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: etcdraft
+            EtcdRaft:
+                Consenters:
+                - Host: orderer1.base.order
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer1.base.order/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer1.base.order/tls/server.crt
+                - Host: orderer2.base.order
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+                - Host: orderer3.base.order
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+                
+            Addresses:
+                - orderer1.base.order:7050
+                - orderer2.base.order:7050
+                - orderer3.base.order:7050
+                     
+
+    # Raft:
+    #     <<: *ChannelDefaults
+    #     Capabilities:
+    #         <<: *ChannelCapabilities
+    #     Orderer:
+    #         <<: *OrdererDefaults
+    #         OrdererType: etcdraft
+    #         EtcdRaft:
+    #             Consenters:
+    #             - Host: orderer1.base
+    #               Port: 7050
+    #               ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer1.base.order/tls/server.crt
+    #               ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer1.base.order/tls/server.crt
+    #             - Host: orderer2.base
+    #               Port: 8050
+    #               ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+    #               ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls/server.crt
+    #             - Host: 
+    #               Port: 9050
+    #               ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer3.base.order/tls/server.crt
+    #               ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer3.base.order/tls/server.crt
+    #         Addresses:
+    #             - orderer1.base:7050
+    #             - orderer2.base:8050
+    #             - orderer3.base:050
+
+            Organizations:
+            - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+            - <<: *OrdererOrg
+        Consortiums:
+            BaseConsortium:
+                Organizations:
+                - *Org1
+                - *Org2

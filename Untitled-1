@@ -1,0 +1,79 @@
+
+  CREATE GENSIS BLOCK
+  -------------------
+
+1. configtxgen -profile Raft  -channelID basechannel -outputBlock ./config/genesis.block
+
+
+CHANNEL CONFIGURATION TRANSACTION
+---------------------------------
+
+2. configtxgen -profile MainChannel -outputCreateChannelTx  ./config/channel.tx -channelID base-main-channel
+
+ANCHOR PEER UPDATES
+-------------------
+
+3. configtxgen -profile MainChannel -outputAnchorPeersUpdate  ./config/BaseLeftOrg.tx -channelID base-main-channel -asOrg LeftOrgMSP
+
+4. configtxgen -profile MainChannel -outputAnchorPeersUpdate  ./config/BaseRightOrg.tx -channelID base-main-channel -asOrg RightOrgMSP
+
+ChannelId:basechannel
+
+
+docker exec -e "CORE_PEER_LOCALMSPID=LeftOrgMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org1.example.com/msp" peer1.base.left peer channel create -o orderer1.workspace:7050 -c basechannel -f /etc/hyperledger/configtx/channel.tx
+
+
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/peerOrganizations/base.left/users/Admin@base.left/msp
+CORE_PEER_ADDRESS=peer1.left.base:7051
+CORE_PEER_LOCALMSPID="LeftOrgMSP"
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.left/peers/peer1.base.left/tls/ca.crt
+
+
+
+peer channel create -o orderer1.base.order:7050 -c basechannel  -f ./channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/tlsca/tlsca.base.order-cert.pem
+
+JOIN CHANNEL
+-------------
+peer channel join -b basechannel.block
+
+
+peer channel update \
+	-o orderer1.base.order:7050 \
+	-c basechannel \
+	-f ./channel-artifacts/BaseRightOrg.tx \
+	--tls \
+	--cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/orderers/orderer1.base.order/msp/tlscacerts/tlsca.base.order-cert.pem
+
+
+CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.right/users/Admin@base.right/msp
+CORE_PEER_ADDRESS=peer1.base.right:9051
+CORE_PEER_LOCALMSPID=RightOrgMSP
+CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.right/peers/peer1.base.right/tls/ca.crt
+CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.right/peers/peer1.base.right/tls/server.crt
+CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.right/peers/peer1.base.right/tls/server.key
+
+docker restart $(docker ps -a -q)
+
+docker-compose up -d --force-recreate --no-deps --build peer1.base.right
+
+echo $(cd crypto-config/peerOrganizations/base.left/ca && ls *_sk)
+
+--cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/tlsca/tlsca.base.order-cert.pem
+
+
+/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/orderers/orderer1.base.order/msp/tlscacerts/tlsca.base.order-cert.pem
+
+docker-compose down -v --remove-orphans
+
+
+docker stop $(docker ps -a -q)                    //stop all containers first
+
+docker rm -f $(docker ps -aq)                     // remove all of them 
+
+docker system prune -a                            // remove all stopcontainers
+
+docker volume  prune                              //remove all volumes
+
+
+/opt/gopath/src/github.com/hyperledger/fabric/peer

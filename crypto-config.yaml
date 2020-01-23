@@ -1,0 +1,37 @@
+OrdererOrgs:
+
+  - Name: Orderer
+    Domain: base.order
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 3
+    SANS:
+        - "localhost"
+        - "127.0.0.1"  
+
+PeerOrgs:
+  - Name: Left
+    Domain: base.left
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 1
+      SANS:
+         - "localhost"
+         - "127.0.0.1"      
+    Users:
+      Start: 1
+      Count: 1
+      
+  - Name: Right
+    Domain: base.right
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 1
+      SANS:
+         - "localhost"
+         - "127.0.0.1"
+    Users:
+      Count: 1
