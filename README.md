@@ -35,7 +35,7 @@ Note:In this tutorial we are using `cryptogen` for generating the certs but its 
  4. `configtx.yaml` contains the policy's for orgz,configurations for the order node and channel
 
 
-Apart from  the above i've added  bash scripts for the some of the network geneartions
+Apart from  the above i've added  bash scripts for automating the some of the network operations
 
 1. `init.sh` Generates certificates and channel artifacts (automates the steps 1 to 9)
 
