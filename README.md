@@ -23,6 +23,7 @@ Note:In this tutorial we are using `cryptogen` for generating the certs but its 
 
 
 **Project directory**
+
  Manily we have four files in the directory 
 
  1.`base.yaml` we are extending this into our `docker-compose.yaml` it includes common configurations for order,peer and cli containers.
