@@ -1,7 +1,7 @@
 
 **HLF**
 
-Tutorial on deploy an simple HLF network using docker-compose 
+Tutorial on deploy ar simple HLF network using docker-compose 
 
 HLF version: 1.4.4
 
