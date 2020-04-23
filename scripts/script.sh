@@ -4,6 +4,8 @@
 
 echo 'CREATE CHANNEL'
 
+sleep 10s
+
 peer channel create -o orderer1.base.order:7050 -c basechannel  -f /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/tlsca/tlsca.base.order-cert.pem
 
 echo 'JOIN ORG1:PEER TO CHANNEL'

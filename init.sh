@@ -6,6 +6,8 @@ CHANNEL_NAME=basechannel
 rm -fr artifacts/*
 rm -fr crypto-config/*
 
+mkdir artifacts
+
 echo 'GENERATING CRYPTO CONFIG'
 
 cryptogen generate --config=./crypto-config.yaml
