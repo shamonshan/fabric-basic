@@ -44,23 +44,4 @@ if [ "$?" -ne 0 ]; then
   exit 1
 fi
 
-echo 'CA LEFT CERT NAME'
-
-echo $(cd crypto-config/peerOrganizations/base.left/ca && ls *_sk)
-
-echo 'CA RIGHT CERT NAME'
-
-echo $(cd crypto-config/peerOrganizations/base.right/ca && ls *_sk)
-
-export CA_LEFT=$(cd crypto-config/peerOrganizations/base.left/ca && ls *_sk)
-
-export CA_RIGHT=$(cd crypto-config/peerOrganizations/base.right/ca && ls *_sk)
-
-echo 'MOFDIFY COMPOSE FILE TO REPLACE THE CA CERTS'
-
-sed -i'' -e  "s#CA_LEFT#$CA_LEFT#g"  docker-compose.yaml
-sed -i'' -e  "s#CA_RIGHT#$CA_RIGHT#g" docker-compose.yaml
-
-echo 'CA CERTS REPLACED'
-
 echo 'ALL ARTIFACTS GENERATED SUCCESSFULLY'

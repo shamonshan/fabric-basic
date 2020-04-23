@@ -17,6 +17,8 @@ services:
       file: base.yaml
       service: orderer-base
     container_name: orderer1.base.order
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=7050
     networks:
     - byfn
     volumes:
@@ -31,6 +33,8 @@ services:
       file: base.yaml
       service: orderer-base
     container_name: orderer2.base.order
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=8050
     networks:
     - byfn
     volumes:
@@ -39,13 +43,15 @@ services:
         - ./crypto-config/ordererOrganizations/base.order/orderers/orderer2.base.order/tls:/var/hyperledger/orderer/tls
         - orderer2.base.order:/var/hyperledger/production/orderer
     ports:
-    - 8050:7050  
+    - 8050:8050  
 
   orderer3.base.order:
     extends:
       file: base.yaml
       service: orderer-base
     container_name: orderer3.base.order
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=9050
     networks:
     - byfn
     volumes:
@@ -54,7 +60,7 @@ services:
         - ./crypto-config/ordererOrganizations/base.order/orderers/orderer3.base.order/tls:/var/hyperledger/orderer/tls
         - orderer3.base.order:/var/hyperledger/production/orderer
     ports:
-    - 9050:7050  
+    - 9050:9050  
 
   peer1.base.left:
     container_name: peer1.left.base
@@ -111,11 +117,11 @@ services:
       environment:
         - FABRIC_CA_SERVER_CA_NAME=ca-left
         - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.base.left-cert.pem
-        - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/74aba2927240dee82f0883df304062c44f01368f5b741e866c16c47f01a6c135_sk
+        - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/${CA_LEFT}
         - FABRIC_CA_SERVER_PORT=7054
       ports:
         - "7054:7054"
-      command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.base.left-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/74aba2927240dee82f0883df304062c44f01368f5b741e866c16c47f01a6c135_sk -b admin:adminpw -d'
+      command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.base.left-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/${CA_LEFT} -b admin:adminpw -d'
       volumes:
         - ./crypto-config/peerOrganizations/base.left/ca/:/etc/hyperledger/fabric-ca-server-config
       container_name: ca_left
@@ -129,11 +135,11 @@ services:
       environment:
         - FABRIC_CA_SERVER_CA_NAME=ca-right
         - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.base.right-cert.pem
-        - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5b554e0f9e2fbe09e3f8d0da6a6569e4c6afbe1eaf875a27d44281338e1d3033_sk
+        - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/${CA_RIGHT}
         - FABRIC_CA_SERVER_PORT=7054
       ports:
         - "7056:7056"
-      command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.base.right-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/5b554e0f9e2fbe09e3f8d0da6a6569e4c6afbe1eaf875a27d44281338e1d3033_sk -b admin:adminpw -d'
+      command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.base.right-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/${CA_RIGHT} -b admin:adminpw -d'
       volumes:
         - ./crypto-config/peerOrganizations/base.right/ca/:/etc/hyperledger/fabric-ca-server-config
       container_name: ca_right
@@ -176,9 +182,10 @@ services:
       command: /bin/bash
       volumes:
           - /var/run/:/host/var/run/
-          - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+          - ./chaincode/:/opt/gopath/src/github.com/chaincode
           - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
           - ./artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+          - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts
       networks:
         - byfn      
 
