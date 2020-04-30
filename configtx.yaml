@@ -13,6 +13,7 @@ Organizations:
             Admins:
                 Type: Signature
                 Rule: "OR('OrdererMSP.admin')"
+                
 
     - &Org1
         Name: LeftOrgMSP
@@ -82,7 +83,11 @@ Application: &ApplicationDefaults
             Rule: "MAJORITY Endorsement"
         Endorsement:
             Type: ImplicitMeta
-            Rule: "MAJORITY Endorsement"    
+            Rule: "MAJORITY Endorsement"   
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"    
+             
 
     Capabilities:
         <<: *ApplicationCapabilities
@@ -119,6 +124,10 @@ Channel: &ChannelDefaults
         Admins:
             Type: ImplicitMeta
             Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+ 
 
     Capabilities:
         <<: *ChannelCapabilities
@@ -156,6 +165,8 @@ Profiles:
                   Port: 9050
                   ClientTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer3.base.order/tls/server.crt
                   ServerTLSCert: crypto-config/ordererOrganizations/base.order/orderers/orderer3.base.order/tls/server.crt
+
+                  
                 
             Addresses:
                 - orderer1.base.order:7050
@@ -164,6 +175,19 @@ Profiles:
                      
             Organizations:
             - *OrdererOrg
+            Policies:
+                Readers:
+                    Type: ImplicitMeta
+                    Rule: "ANY Readers"
+                Writers:
+                    Type: ImplicitMeta
+                    Rule: "ANY Writers"
+                Admins:
+                    Type: ImplicitMeta
+                    Rule: "MAJORITY Admins"
+                BlockValidation:
+                    Type: ImplicitMeta
+                    Rule: "ANY Writers"
             Capabilities:
                 <<: *OrdererCapabilities
         Application:

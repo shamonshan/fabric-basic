@@ -54,6 +54,8 @@ services:
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
+      
+
 
   ca-base:
     image: hyperledger/fabric-ca:$CA_TAG

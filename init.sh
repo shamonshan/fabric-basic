@@ -3,7 +3,7 @@
 export FABRIC_CFG_PATH=${PWD}
 CHANNEL_NAME=basechannel
 
-rm -fr artifacts/*
+rm -rf artifacts/*
 rm -fr crypto-config/*
 
 mkdir artifacts

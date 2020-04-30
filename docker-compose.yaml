@@ -80,6 +80,8 @@ services:
         - /var/run/:/host/var/run/
         - ./crypto-config/peerOrganizations/base.left/peers/peer1.base.left/msp:/etc/hyperledger/fabric/msp
         - ./crypto-config/peerOrganizations/base.left/peers/peer1.base.left/tls:/etc/hyperledger/fabric/tls
+        - ./chaincode/external_builder:/builders/external
+        - ./fabric-config/core.yaml:/etc/hyperledger/fabric/core.yaml
         - peer1.base.left:/var/hyperledger/production
     ports:
       - 7051:7051
@@ -104,6 +106,9 @@ services:
         - /var/run/:/host/var/run/
         - ./crypto-config/peerOrganizations/base.right/peers/peer1.base.right/msp:/etc/hyperledger/fabric/msp
         - ./crypto-config/peerOrganizations/base.right/peers/peer1.base.right/tls:/etc/hyperledger/fabric/tls
+        - ./chaincode/external_builder:/builders/external
+        - ./fabric-config/core.yaml:/etc/hyperledger/fabric/core.yaml
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer
         - peer1.base.right:/var/hyperledger/production
     ports:
       - 9051:9051
@@ -177,6 +182,8 @@ services:
         - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.left/peers/peer1.base.left/tls/server.crt
         - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.left/peers/peer1.base.left/tls/server.key
         - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/base.left/peers/peer1.base.left/tls/ca.crt
+        - CORE_CHAINCODE_EXTERNALBUILDERSPATH=/builders/external
+        - CORE_CHAINCODE_EXTERNALBUILDERS_NAME=external-builder
         - GODEBUG=netdns=go
       working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
       command: /bin/bash
