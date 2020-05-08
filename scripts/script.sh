@@ -2,18 +2,20 @@
 
 #Create the channel
 
-echo 'CREATE CHANNEL'
+echo '---CREATING CHANNEL---'
 
 sleep 10s
 
 peer channel create -o orderer1.base.order:7050 -c basechannel  -f /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/base.order/tlsca/tlsca.base.order-cert.pem
+
+echo '---CHANNEL CREATED---'
 
 echo 'JOIN ORG1:PEER TO CHANNEL'
 sleep 10s
 #join org1 peer to channel
 peer channel join -b basechannel.block
 
-echo '--UPDATE PEER FOR ORG:1---'
+echo '--UPDATE PEERS  FOR ORG:1---'
 
 peer channel update \
 	-o orderer1.base.order:7050 \

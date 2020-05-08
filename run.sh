@@ -18,6 +18,6 @@ docker-compose -f  docker-compose.yaml up -d
 
 echo '---LOGIN TO CLI CONTAINER----'
 
-docker exec  cli  scripts/script.sh
+docker exec  cli  bash -c "scripts/script.sh"
 
 echo 'COMPLETED'
